@@ -1,6 +1,7 @@
 from zope.interface import implements, verify
 
-from ai import statemachine
+import statemachine
+import goalStates
 
 from twodee.geometry import (calculate,
                              convert,
@@ -300,7 +301,7 @@ class Break(object):
         steeringStateMachine = owner.steeringStateMachine
         target = owner.getTarget() or cls.acquireTarget(owner)
         if target is None:
-            steeringStateMachine.changeState(EscortMotherShip)
+            steeringStateMachine.changeState(goalStates.EscortMotherShip)
             return
         
         if pastBreakThreshold(owner,

@@ -1,6 +1,6 @@
 from zope.interface import implements, verify
 
-from ai import statemachine
+import statemachine
 import targetingsystem, steeringStates
 
 from twodee.geometry import (calculate,
