@@ -58,9 +58,9 @@ class DebugFrame(wx.Frame):
 
     def notifyShipStartLife(self,
                             ship):
-        shipName = wx.StaticText(self, -1, 'ShipName')
+        shipNameLabel = wx.StaticText(self, -1, ship.name)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(shipName, 1, wx.ADJUST_MINSIZE, 0)
+        sizer.Add(shipNameLabel, 1, wx.ADJUST_MINSIZE, 0)
         self.columnSizer.Add(sizer, 1, wx.ADJUST_MINSIZE, 0)  
         
         self.Layout()

@@ -30,7 +30,9 @@ class Ship(object):
                  startingState=None,
                  mission=None,
                  globalState=None,
-                 targetingSystem=None):
+                 targetingSystem=None,
+                 name=None):
+        self.name = name
         self.length = length
         self.width = width
         self.lengthSquared = length * length

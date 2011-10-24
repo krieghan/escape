@@ -24,8 +24,11 @@ def getFleetReport(fleet):
 class Fleet(object):
     def __init__(self,
                  fleetColor,
-                 teamName):
+                 teamName,
+                 flightGroupNames):
         self.motherShip = None
+        self.flightGroupNames = flightGroupNames
+        self.currentFlightGroupIndex = 0
         self.flightGroups = {'fighter' : [],
                              'bomber' : [],
                              'interceptor' : []}
@@ -39,8 +42,11 @@ class Fleet(object):
         for flightGroup in flightGroups:
             shipType = flightGroup.shipType
             self.flightGroups[shipType].append(flightGroup)
+            count = 1
             for ship in flightGroup.ships:
+                ship.name = "%s %s" % (flightGroup.name, count)
                 ship.startLife()
+                count += 1
         
     def removeFlightGroup(self,
                           flightGroup):
@@ -95,19 +101,29 @@ class Fleet(object):
         for flightGroupCluster in self.flightGroups.values():
             for flightGroup in flightGroupCluster:
                 flightGroup.stateMachine.start()
+                
+    def getNextFlightGroupName(self):
+        name = self.flightGroupNames[self.currentFlightGroupIndex]
+        self.currentFlightGroupIndex = (self.currentFlightGroupIndex + 1) % len(self.flightGroupNames)
+        return name
             
 class FlightGroup(object):
     def __init__(self,
                  fleet,
                  shipType,
                  startingState,
-                 ships):
+                 ships,
+                 name=None):
         self.fleet = fleet
         self.ships = []
         self.addShips(ships)
         self.shipType = shipType
         self.stateMachine = statemachine.StateMachine(owner=self,
                                                       currentState=startingState)
+        
+        if name is None:
+            name = fleet.getNextFlightGroupName()
+        self.name = name
     
     def getAllShips(self):
         return self.ships
@@ -370,7 +386,8 @@ def createFighterFlightGroup(fleet,
     
     return fighterGroup
 
-def createMotherShip(fleet,
+def createMotherShip(name,
+                     fleet,
                      canvas,
                      position,
                      carryOutMission):
@@ -391,7 +408,8 @@ def createMotherShip(fleet,
                     health=10000,
                     fleet=fleet,
                     mission=carryOutMission,
-                    startingState=carryOutMission)
+                    startingState=carryOutMission,
+                    name=name)
     halfWidth = width / 2.0
     halfLength = length / 2.0
     sixthWidth = width / 6.0
@@ -414,6 +432,7 @@ def createMotherShip(fleet,
                            turret4,
                            turret5,
                            turret6])
+    motherShip.startLife()
     return motherShip
 
 def addFlightGroupsToHangar(howMany,
@@ -431,9 +450,12 @@ def addFlightGroupsToHangar(howMany,
 
 def createEscapingFleet(canvas):
     fleetColor = (0, 0, 1)
+    flightGroupNames = ["Red", "Green", "Blue", "Scarlet", "Gold", "Yellow"]
     escapingFleet = Fleet(fleetColor=fleetColor,
-                          teamName='defender')
-    escapingMotherShip = createMotherShip(escapingFleet,
+                          teamName='defender',
+                          flightGroupNames=flightGroupNames)
+    escapingMotherShip = createMotherShip("Jagged Edge",
+                                          escapingFleet,
                                           canvas,
                                           position=(30000, 30000),
                                           carryOutMission=goalStates.EscapeToJumpPoint)
@@ -454,9 +476,12 @@ def createEscapingFleet(canvas):
 
 def createPursuingFleet(canvas):
     fleetColor = (1, 0, 0)
+    flightGroupNames = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta"]
     pursuingFleet = Fleet(fleetColor=fleetColor,
-                          teamName='attacker')
-    pursuingMotherShip = createMotherShip(pursuingFleet,
+                          teamName='attacker',
+                          flightGroupNames=flightGroupNames)
+    pursuingMotherShip = createMotherShip("Dark Soul",
+                                          pursuingFleet,
                                           canvas,
                                           position=(12000, 12000),
                                           carryOutMission=goalStates.AttackEscapingMothership)
