@@ -1,6 +1,6 @@
 import wx.glcanvas
 from OpenGL import GL, GLU
-import agents, render, states, fleets
+import agents, render, fleets
 
 
 class EscapeCanvas(wx.glcanvas.GLCanvas):
@@ -11,7 +11,7 @@ class EscapeCanvas(wx.glcanvas.GLCanvas):
         wx.glcanvas.GLCanvas.__init__(self,
                                       parent,
                                       -1)
-        
+        self.frame = parent
         self.init = 0
         self.Bind(wx.EVT_PAINT, self.onPaint)
         self.Bind(wx.EVT_SIZE, self.onSize)

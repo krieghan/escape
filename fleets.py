@@ -23,12 +23,14 @@ def getFleetReport(fleet):
             
 class Fleet(object):
     def __init__(self,
-                 fleetColor):
+                 fleetColor,
+                 teamName):
         self.motherShip = None
         self.flightGroups = {'fighter' : [],
                              'bomber' : [],
                              'interceptor' : []}
         self.enemyFleet = None
+        self.teamName = teamName
         self.fleetColor = fleetColor
         self.instancesOfFriendlyFire = 0
         
@@ -37,6 +39,8 @@ class Fleet(object):
         for flightGroup in flightGroups:
             shipType = flightGroup.shipType
             self.flightGroups[shipType].append(flightGroup)
+            for ship in flightGroup.ships:
+                ship.startLife()
         
     def removeFlightGroup(self,
                           flightGroup):
@@ -427,7 +431,8 @@ def addFlightGroupsToHangar(howMany,
 
 def createEscapingFleet(canvas):
     fleetColor = (0, 0, 1)
-    escapingFleet = Fleet(fleetColor=fleetColor)
+    escapingFleet = Fleet(fleetColor=fleetColor,
+                          teamName='defender')
     escapingMotherShip = createMotherShip(escapingFleet,
                                           canvas,
                                           position=(30000, 30000),
@@ -449,7 +454,8 @@ def createEscapingFleet(canvas):
 
 def createPursuingFleet(canvas):
     fleetColor = (1, 0, 0)
-    pursuingFleet = Fleet(fleetColor=fleetColor)
+    pursuingFleet = Fleet(fleetColor=fleetColor,
+                          teamName='attacker')
     pursuingMotherShip = createMotherShip(pursuingFleet,
                                           canvas,
                                           position=(12000, 12000),

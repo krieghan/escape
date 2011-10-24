@@ -1,7 +1,7 @@
 import math, random
 from zope.interface import implements, verify
 
-from ai import interfaces, statemachine
+import interfaces, statemachine
 from twodee.geometry import (calculate,
                              vector,
                              convert)
@@ -30,7 +30,7 @@ class Ship(object):
                  startingState=None,
                  mission=None,
                  globalState=None,
-                 targetingSystem=None,):
+                 targetingSystem=None):
         self.length = length
         self.width = width
         self.lengthSquared = length * length
@@ -85,9 +85,34 @@ class Ship(object):
         self.health = health
         self.totalHealth = health
         
+        debugObserver = canvas.frame.childFrames.get('%sDebug' % fleet.teamName)
+        self.observers = [debugObserver]
+        
         
     def draw(self):
         self.render(self)
+    
+    
+    #observable
+    def startLife(self):
+        for observer in self.observers:
+            observer.notifyShipStartLife(self)
+    
+    def endLife(self):
+        self.active = False
+        while self.targettingTurrets:
+            targettingTurret = self.targettingTurrets[0]
+            targettingTurret.notifyOfDeath(self)
+            
+        
+        if self.flightGroup:
+            self.flightGroup.removeShip(self)
+        elif self.fleet.motherShip == self:
+            self.fleet.motherShip = None
+            
+        for observer in self.observers:
+            observer.notifyShipEndLife(self)
+    
     
     def addFlightGroupsToHangar(self,
                                 flightGroups):
@@ -301,21 +326,7 @@ class Ship(object):
     def removeFromTargettingTurrets(self,
                             targeter):
         self.targettingTurrets.remove(targeter)
-   
-    def remove(self):
-        self.active = False
-        while self.targettingTurrets:
-            targettingTurret = self.targettingTurrets[0]
-            targettingTurret.notifyOfDeath(self)
-            
-        
-        if self.flightGroup:
-            self.flightGroup.removeShip(self)
-        elif self.fleet.motherShip == self:
-            self.fleet.motherShip = None
-        
-        
-    
+
     def hitBy(self,
               shot):
         canvas = self.canvas
@@ -327,7 +338,7 @@ class Ship(object):
         self.turnsUntilNormalColor = 3
         self.health -= shot.damage
         if self.health <= 0:
-            self.remove()
+            self.endLife()
         
     def intersectsPoint(self,
                         point):
