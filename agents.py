@@ -53,10 +53,12 @@ class Ship(object):
         self.mission = mission
         self.steeringStateMachine = statemachine.StateMachine(owner=self,
                                                               currentState=None,
-                                                              globalState=None)
+                                                              globalState=None,
+                                                              name='steering')
         self.goalStateMachine = statemachine.StateMachine(owner=self,
                                                           currentState=startingState,
-                                                          globalState=globalState)
+                                                          globalState=globalState,
+                                                          name='goal')
         self.stateMachines = [self.goalStateMachine, self.steeringStateMachine]
         self.flightGroup = flightGroup
         self.target = None
@@ -177,9 +179,9 @@ class Ship(object):
                                                   worldLaunchOffset)
         groupToLaunch.setPosition(newPosition)
         groupToLaunch.setVelocity((1, 0))
-        groupToLaunch.startStateMachine()
         self.removeFlightGroup(groupToLaunch)
         fleet.addFlightGroups([groupToLaunch])
+        groupToLaunch.startStateMachine()
         self.turnsUntilNextLaunch = self.turnsBetweenLaunches
         
     def engageThrottle(self,
@@ -339,6 +341,10 @@ class Ship(object):
             print (canvas.escapingFleet.instancesOfFriendlyFire, canvas.pursuingFleet.instancesOfFriendlyFire) 
         self.turnsUntilNormalColor = 3
         self.health -= shot.damage
+        
+        for observer in self.observers:
+            observer.notifyShipHit(self)
+        
         if self.health <= 0:
             self.endLife()
         
