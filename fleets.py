@@ -28,6 +28,7 @@ class Fleet(object):
                  flightGroupNames):
         self.motherShip = None
         self.flightGroupNames = flightGroupNames
+        self.namesInUse = set([])
         self.currentFlightGroupIndex = 0
         self.flightGroups = {'fighter' : [],
                              'bomber' : [],
@@ -40,6 +41,7 @@ class Fleet(object):
     def addFlightGroups(self,
                         flightGroups):
         for flightGroup in flightGroups:
+            flightGroup.assignName()
             shipType = flightGroup.shipType
             self.flightGroups[shipType].append(flightGroup)
             count = 1
@@ -52,6 +54,7 @@ class Fleet(object):
                           flightGroup):
         shipType = flightGroup.shipType
         self.flightGroups[shipType].remove(flightGroup)
+        self.namesInUse.remove(flightGroup.name)
         
     def setMotherShip(self,
                       motherShip):
@@ -103,8 +106,13 @@ class Fleet(object):
                 flightGroup.stateMachine.start()
                 
     def getNextFlightGroupName(self):
-        name = self.flightGroupNames[self.currentFlightGroupIndex]
-        self.currentFlightGroupIndex = (self.currentFlightGroupIndex + 1) % len(self.flightGroupNames)
+        
+        name = None
+        while name in self.namesInUse or name is None:
+            name = self.flightGroupNames[self.currentFlightGroupIndex]
+            self.currentFlightGroupIndex = (self.currentFlightGroupIndex + 1) % len(self.flightGroupNames)
+
+        self.namesInUse.add(name)            
         return name
             
 class FlightGroup(object):
@@ -121,9 +129,11 @@ class FlightGroup(object):
         self.stateMachine = statemachine.StateMachine(owner=self,
                                                       currentState=startingState)
         
-        if name is None:
-            name = fleet.getNextFlightGroupName()
         self.name = name
+    
+    def assignName(self):
+        if self.name is None:
+            self.name = self.fleet.getNextFlightGroupName()
     
     def getAllShips(self):
         return self.ships
