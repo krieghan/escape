@@ -402,6 +402,7 @@ class Turret(object):
         self.shotSpeed = shotSpeed
         self.obstructed = False
         self.clearShotTolerance = .15
+        self.active = True
         
     def getLength(self):
         return 0
@@ -669,6 +670,7 @@ class Shot(object):
         self.fromTurret = fromTurret
         self.damage = damage
         self.target = target
+        self.active = True
     
     
     def hit(self):
@@ -692,6 +694,7 @@ class Shot(object):
         if shipHit:
             shipHit.hitBy(self)
             canvas.removeShot(self)
+            self.active = False
             return
         
         
@@ -756,6 +759,7 @@ class Stationary(object):
         self.width = width
         self.render = render
         self.color = color
+        self.active = True
         
     def draw(self):
         self.render(self)

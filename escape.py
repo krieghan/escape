@@ -124,6 +124,7 @@ class DebugFrame(wx.Frame):
     
     def notifyStateChange(self,
                           stateMachine):
+        assert stateMachine.owner.active
         if stateMachine.name == 'goal':
             stateLabel = self.rows[stateMachine.owner.name]['goalState']
         elif stateMachine.name == 'steering':
@@ -146,6 +147,8 @@ class DebugFrame(wx.Frame):
         self.Layout()
         self.freeSizers.append(row_sizer_index)
         del self.rows[ship.name]
+        assert not ship.active
+        print "Deleting %s" % ship.name
         
 def run():
     app = wx.PySimpleApp(0)

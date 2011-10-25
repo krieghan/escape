@@ -187,6 +187,8 @@ class EscapeCanvas(wx.glcanvas.GLCanvas):
                    event):
         self.timeStep += 1
         for canvasElement in self.getAllCanvasElements():
+            if not canvasElement.active:
+                continue
             canvasElement.update(timeStep=self.timeStep,
                                  timeElapsed=self.timeElapsed)
         self.onDraw()
