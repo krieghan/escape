@@ -78,6 +78,8 @@ class Ship(object):
         halfWidth = width / 2.0
         halfLength = length / 2.0
         
+        self.hangarEntryThresholdSquared = 1000000
+        
         self.boundingBox = (halfLength, halfWidth, -halfLength, -halfWidth)
         speed = vector.getMagnitude(velocity)
         self.obstacleDetectionDimensions =\
@@ -128,6 +130,11 @@ class Ship(object):
                           flightGroup):
         groupType = flightGroup.shipType
         self.flightGroups[groupType].remove(flightGroup)
+        
+    def addShipToHangar(self,
+                        ship):
+        flightGroup = ship.flightGroup
+        
     
     def acquireTarget(self):
         self.setTarget(self.targetingSystem.acquireTarget(self))

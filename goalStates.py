@@ -253,7 +253,15 @@ class ReturnToMotherShip(object):
     @classmethod
     def execute(cls,
                 owner):
-        pass
+        motherShip = owner.fleet.motherShip
+        ownerPosition = owner.getPosition()
+        targetPosition = motherShip.getPosition()
+        ownerToTarget = calculate.subtractPoints(targetPosition,
+                                                 ownerPosition)
+        distanceSquaredToTarget = vector.getMagnitudeSquared(ownerToTarget)
+        if distanceSquaredToTarget <= motherShip.hangarEntryThresholdSquared:
+            motherShip.pickup(owner)
+        
         
         
         
