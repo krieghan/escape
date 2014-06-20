@@ -91,8 +91,11 @@ class Ship(object):
         self.health = health
         self.totalHealth = health
         
+        '''
         debugObserver = canvas.frame.childFrames.get('%sDebug' % fleet.teamName)
         self.observers = [debugObserver]
+        '''
+        self.observers = []
         
         
     def draw(self):
@@ -131,9 +134,9 @@ class Ship(object):
         groupType = flightGroup.shipType
         self.flightGroups[groupType].remove(flightGroup)
         
-    def addShipToHangar(self,
-                        ship):
-        flightGroup = ship.flightGroup
+    def pickup(self,
+               ship):
+       ship.endLife() 
         
     
     def acquireTarget(self):
@@ -150,7 +153,6 @@ class Ship(object):
         
         desiredNumberOfFriendlyBombers = 1
         desiredNumberOfFriendlyFighters = 1
-        
         
         fleet = self.fleet
         enemyFleet = fleet.getEnemyFleet()
@@ -345,7 +347,6 @@ class Ship(object):
         enemyFleet = fleet.getEnemyFleet()
         if shot.fromTurret.owner.fleet == fleet:
             fleet.instancesOfFriendlyFire += 1
-            print (canvas.escapingFleet.instancesOfFriendlyFire, canvas.pursuingFleet.instancesOfFriendlyFire) 
         self.turnsUntilNormalColor = 3
         self.health -= shot.damage
         

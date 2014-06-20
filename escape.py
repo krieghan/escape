@@ -153,6 +153,7 @@ class DebugFrame(wx.Frame):
 def run():
     app = wx.PySimpleApp(0)
     wx.InitAllImageHandlers()
+    '''
     attackerDebugFrame = DebugFrame("Attacker Status",
                                     None,
                                     -1, 
@@ -163,14 +164,15 @@ def run():
                                     "")
     childFrames = {'attackerDebug' : attackerDebugFrame,
                    'defenderDebug' : defenderDebugFrame}
-    frame = EscapeFrame(childFrames,
+    '''
+    frame = EscapeFrame({},
                         None, 
                         -1, 
                         "")
     app.SetTopWindow(frame)
     frame.Show()
-    attackerDebugFrame.Show()
-    defenderDebugFrame.Show()
+    #attackerDebugFrame.Show()
+    #defenderDebugFrame.Show()
     app.MainLoop()
 
 
