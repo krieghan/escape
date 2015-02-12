@@ -1,2 +1,4 @@
 PyOpenGL
 PyOpenGL_accelerate
+hg+http://bitbucket.org/pygame/pygame
+zope.interface

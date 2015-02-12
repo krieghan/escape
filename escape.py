@@ -1,9 +1,18 @@
-import wx
 import optparse
+
 import canvas
 
+def run():
+    world = canvas.EscapeCanvas(worldHeight=100000,
+                                worldWidth=100000)
+    world.start()
 
-class EscapeFrame(wx.Frame):
+
+if __name__ == "__main__":
+    run()
+
+'''
+class OldEscapeFrame(wx.Frame):
     def __init__(self, 
                  childFrames,
                  *args,
@@ -149,11 +158,8 @@ class DebugFrame(wx.Frame):
         del self.rows[ship.name]
         assert not ship.active
         print "Deleting %s" % ship.name
-        
-def run():
     app = wx.PySimpleApp(0)
     wx.InitAllImageHandlers()
-    '''
     attackerDebugFrame = DebugFrame("Attacker Status",
                                     None,
                                     -1, 
@@ -164,7 +170,6 @@ def run():
                                     "")
     childFrames = {'attackerDebug' : attackerDebugFrame,
                    'defenderDebug' : defenderDebugFrame}
-    '''
     frame = EscapeFrame({},
                         None, 
                         -1, 
@@ -175,8 +180,6 @@ def run():
     #defenderDebugFrame.Show()
     app.MainLoop()
 
-
+'''
     
-if __name__ == "__main__":
-    run()
     

@@ -1,25 +1,30 @@
-import wx.glcanvas
-from OpenGL import GL, GLU
+import sys
+
+from OpenGL import GL, GLU, GLUT
+
 import agents, render, fleets
 
 
-class EscapeCanvas(wx.glcanvas.GLCanvas):
+class EscapeCanvas(object):
     def __init__(self,
-                 parent,
                  worldWidth,
                  worldHeight):
-        wx.glcanvas.GLCanvas.__init__(self,
-                                      parent,
-                                      -1)
-        self.frame = parent
+        GLUT.glutInit(sys.argv)
+        GLUT.glutInitDisplayMode(GLUT.GLUT_DOUBLE | 
+                                 GLUT.GLUT_RGB | 
+                                 GLUT.GLUT_DEPTH)
+        GLUT.glutInitWindowSize(400,400)
+        GLUT.glutCreateWindow('Escape')
+        GLUT.glutDisplayFunc(self.onDraw)
+
         self.init = 0
-        self.Bind(wx.EVT_PAINT, self.onPaint)
-        self.Bind(wx.EVT_SIZE, self.onSize)
-        self.Bind(wx.EVT_TIMER, self.handleTime)
+        #self.Bind(wx.EVT_PAINT, self.onPaint)
+        #self.Bind(wx.EVT_SIZE, self.onSize)
+        #self.Bind(wx.EVT_TIMER, self.handleTime)
         
         time = 10.0
-        self.timer = wx.Timer(self)
-        self.timer.Start(time)
+        #self.timer = wx.Timer(self)
+        #self.timer.Start(time)
         
         self.worldmaxleft = 0
         self.worldmaxright = worldWidth
@@ -45,6 +50,10 @@ class EscapeCanvas(wx.glcanvas.GLCanvas):
         self.shotsByTarget = {}
         
         self.initWorld()
+
+    def start(self):
+        self.InitGL()
+        GLUT.glutMainLoop()
 
     def initWorld(self):
         self.jumpPoint = agents.Stationary(position=(90000, 90000),
@@ -102,6 +111,10 @@ class EscapeCanvas(wx.glcanvas.GLCanvas):
 
     #methods on this function
 
+    def getClientSizeTuple(self):
+        return (GLUT.glutGet(GLUT.GLUT_WINDOW_HEIGHT),
+                GLUT.glutGet(GLUT.GLUT_WINDOW_WIDTH))
+
     def setupView(self):
         """This function does the actual work to setup the window so we can 
         draw in it.  Most of its task is going to be sizing the Viewport to
@@ -110,7 +123,7 @@ class EscapeCanvas(wx.glcanvas.GLCanvas):
         
         """
         
-        self.clientsize = self.GetClientSizeTuple()
+        self.clientsize = self.getClientSizeTuple()
        
         height = self.worldHeight 
         width = self.worldWidth  
@@ -165,14 +178,14 @@ class EscapeCanvas(wx.glcanvas.GLCanvas):
         self.onDraw()
     
     def onDraw(self):
-        self.SetCurrent()
+        #self.SetCurrent()
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)       
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
 
         for element in self.getAllCanvasElements():
             element.draw()
-        self.SwapBuffers()
+        GLUT.glutSwapBuffers()
         self.setupView()
     
     def onSize(self,event):
