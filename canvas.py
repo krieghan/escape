@@ -14,7 +14,7 @@ class EscapeCanvas(object):
         GLUT.glutInitDisplayMode(GLUT.GLUT_DOUBLE | 
                                  GLUT.GLUT_RGB | 
                                  GLUT.GLUT_DEPTH)
-        GLUT.glutInitWindowSize(2000,2000)
+        GLUT.glutInitWindowSize(500,500)
         GLUT.glutCreateWindow('Escape')
         GLUT.glutDisplayFunc(self.onDraw)
 
@@ -133,7 +133,7 @@ class EscapeCanvas(object):
         
         ratio = width / height
         #Should seem familiar, since we did it in class...
-        if ratio > screenratio:
+        if ratio >= screenratio:
         
             self.viewport_left = 0
             self.viewport_bottom = (self.clientsize[1] - (self.clientsize[0] / ratio)) / 2
