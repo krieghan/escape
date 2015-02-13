@@ -136,16 +136,16 @@ class EscapeCanvas(object):
         if ratio >= screenratio:
         
             self.viewport_left = 0
-            self.viewport_bottom = (self.clientsize[1] - (self.clientsize[0] / ratio)) / 2
+            self.viewport_bottom = int((self.clientsize[1] - (self.clientsize[0] / ratio)) / 2)
             self.viewport_width = self.clientsize[0]
-            self.viewport_height = self.clientsize[0] / ratio
+            self.viewport_height = int(self.clientsize[0] / ratio)
             
             
         if ratio < screenratio:
         
-            self.viewport_left = (self.clientsize[0] - self.clientsize[1] * ratio) / 2
+            self.viewport_left = int((self.clientsize[0] - self.clientsize[1] * ratio) / 2)
             self.viewport_bottom = 0
-            self.viewport_width = self.clientsize[1] * ratio
+            self.viewport_width = int(self.clientsize[1] * ratio)
             self.viewport_height = self.clientsize[1]
         
         self.viewport_right = self.viewport_left + self.viewport_width
