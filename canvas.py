@@ -9,11 +9,12 @@ class EscapeCanvas(object):
     def __init__(self,
                  worldWidth,
                  worldHeight):
+        self.time_interval = 10
         GLUT.glutInit(sys.argv)
         GLUT.glutInitDisplayMode(GLUT.GLUT_DOUBLE | 
                                  GLUT.GLUT_RGB | 
                                  GLUT.GLUT_DEPTH)
-        GLUT.glutInitWindowSize(400,400)
+        GLUT.glutInitWindowSize(2000,2000)
         GLUT.glutCreateWindow('Escape')
         GLUT.glutDisplayFunc(self.onDraw)
 
@@ -22,9 +23,6 @@ class EscapeCanvas(object):
         #self.Bind(wx.EVT_SIZE, self.onSize)
         #self.Bind(wx.EVT_TIMER, self.handleTime)
         
-        time = 10.0
-        #self.timer = wx.Timer(self)
-        #self.timer.Start(time)
         
         self.worldmaxleft = 0
         self.worldmaxright = worldWidth
@@ -41,7 +39,7 @@ class EscapeCanvas(object):
         self.viewport_width = 0
         
         self.timeStep = 1
-        self.timeElapsed = time / 1000
+        self.timeElapsed = self.time_interval / 1000.0
         
         self.jumpPoint = None
         self.escapingFleet = None
@@ -53,7 +51,9 @@ class EscapeCanvas(object):
 
     def start(self):
         self.InitGL()
+        GLUT.glutTimerFunc(self.time_interval, self.handleTime, None)
         GLUT.glutMainLoop()
+
 
     def initWorld(self):
         self.jumpPoint = agents.Stationary(position=(90000, 90000),
@@ -196,8 +196,7 @@ class EscapeCanvas(object):
         self.setupView()
         event.Skip()
 
-    def handleTime(self,
-                   event):
+    def handleTime(self, value):
         self.timeStep += 1
         for canvasElement in self.getAllCanvasElements():
             if not canvasElement.active:
@@ -205,7 +204,8 @@ class EscapeCanvas(object):
             canvasElement.update(timeStep=self.timeStep,
                                  timeElapsed=self.timeElapsed)
         self.onDraw()
-        event.Skip()
+
+        GLUT.glutTimerFunc(self.time_interval, self.handleTime, None)
         
     def getWorldWidth(self):
         return self.worldWidth
