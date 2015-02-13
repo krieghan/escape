@@ -131,8 +131,8 @@ class EscapeCanvas(object):
         #The ratio of the width to the height in the client-area
         screenratio = float(self.clientsize[0]) / float(self.clientsize[1])
         
-        ratio = width / height
-        #Should seem familiar, since we did it in class...
+        ratio = float(width) / float(height)
+
         if ratio >= screenratio:
         
             self.viewport_left = 0
