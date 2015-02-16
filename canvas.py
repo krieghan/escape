@@ -11,6 +11,7 @@ class EscapeCanvas(object):
                  worldHeight):
         self.time_interval = 10
         GLUT.glutInit(sys.argv)
+        self.lastTime = GLUT.glutGet(GLUT.GLUT_ELAPSED_TIME)
         GLUT.glutInitDisplayMode(GLUT.GLUT_DOUBLE | 
                                  GLUT.GLUT_RGB | 
                                  GLUT.GLUT_DEPTH)
@@ -197,6 +198,10 @@ class EscapeCanvas(object):
         event.Skip()
 
     def handleTime(self, value):
+        currentTime = GLUT.glutGet(GLUT.GLUT_ELAPSED_TIME)
+        self.timeElapsed = (currentTime - self.lastTime) / 1000.0
+        self.lastTime = currentTime
+
         self.timeStep += 1
         for canvasElement in self.getAllCanvasElements():
             if not canvasElement.active:
