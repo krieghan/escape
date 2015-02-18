@@ -18,12 +18,9 @@ class EscapeCanvas(object):
         GLUT.glutInitWindowSize(500,500)
         GLUT.glutCreateWindow('Escape')
         GLUT.glutDisplayFunc(self.onDraw)
+        GLUT.glutReshapeFunc(self.onSize)
 
         self.init = 0
-        #self.Bind(wx.EVT_PAINT, self.onPaint)
-        #self.Bind(wx.EVT_SIZE, self.onSize)
-        #self.Bind(wx.EVT_TIMER, self.handleTime)
-        
         
         self.worldmaxleft = 0
         self.worldmaxright = worldWidth
@@ -108,15 +105,16 @@ class EscapeCanvas(object):
         """
         GL.glClearColor(0.0,0.0,0.0,0.0); # set clear color to black
         GL.glEnable(GL.GL_TEXTURE_2D)
-        self.setupView()
+        clientsize = self.getClientSizeTuple()
+        self.setupView(clientsize[0], clientsize[1])
 
     #methods on this function
 
     def getClientSizeTuple(self):
-        return (GLUT.glutGet(GLUT.GLUT_WINDOW_HEIGHT),
-                GLUT.glutGet(GLUT.GLUT_WINDOW_WIDTH))
+        return (GLUT.glutGet(GLUT.GLUT_WINDOW_WIDTH),
+                GLUT.glutGet(GLUT.GLUT_WINDOW_HEIGHT))
 
-    def setupView(self):
+    def setupView(self, client_width, client_height):
         """This function does the actual work to setup the window so we can 
         draw in it.  Most of its task is going to be sizing the Viewport to
         maintain aspect ratio and sizing the World Window to achieve the 
@@ -124,41 +122,36 @@ class EscapeCanvas(object):
         
         """
         
-        self.clientsize = self.getClientSizeTuple()
-       
         height = self.worldHeight 
         width = self.worldWidth  
         
         #The ratio of the width to the height in the client-area
-        screenratio = float(self.clientsize[0]) / float(self.clientsize[1])
+        screenratio = float(client_width) / float(client_height)
         
         ratio = float(width) / float(height)
 
         if ratio >= screenratio:
         
             self.viewport_left = 0
-            self.viewport_bottom = int((self.clientsize[1] - (self.clientsize[0] / ratio)) / 2)
-            self.viewport_width = self.clientsize[0]
-            self.viewport_height = int(self.clientsize[0] / ratio)
+            self.viewport_bottom = int((client_height - (client_width / ratio)) / 2)
+            self.viewport_width = client_width
+            self.viewport_height = int(client_width / ratio)
             
             
         if ratio < screenratio:
         
-            self.viewport_left = int((self.clientsize[0] - self.clientsize[1] * ratio) / 2)
+            self.viewport_left = int((client_width - client_height * ratio) / 2)
             self.viewport_bottom = 0
-            self.viewport_width = int(self.clientsize[1] * ratio)
-            self.viewport_height = self.clientsize[1]
+            self.viewport_width = int(client_height * ratio)
+            self.viewport_height = client_height
         
         self.viewport_right = self.viewport_left + self.viewport_width
         self.viewport_top = self.viewport_bottom + self.viewport_height
-        
-        #glViewport(0, 0, self.clientsize[0], self.clientsize[1])
         
         GL.glViewport(self.viewport_left, 
                       self.viewport_bottom, 
                       self.viewport_width, 
                       self.viewport_height)
-         
         
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
@@ -187,15 +180,13 @@ class EscapeCanvas(object):
         for element in self.getAllCanvasElements():
             element.draw()
         GLUT.glutSwapBuffers()
-        self.setupView()
+        #self.setupView()
     
-    def onSize(self,event):
+    def onSize(self,width,height):
         """ This function is called when a resize event occurs. The primary
         purpose for this is to readjust the viewport appropriately.
         """
-        
-        self.setupView()
-        event.Skip()
+        self.setupView(width, height)
 
     def handleTime(self, value):
         currentTime = GLUT.glutGet(GLUT.GLUT_ELAPSED_TIME)
