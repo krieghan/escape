@@ -4,56 +4,19 @@ from OpenGL import GL, GLU, GLUT
 
 import agents, render, fleets
 
+class EscapeWorld(object):
 
-class EscapeCanvas(object):
-    def __init__(self,
-                 worldWidth,
-                 worldHeight):
-        self.time_interval = 10
-        GLUT.glutInit(sys.argv)
-        self.lastTime = GLUT.glutGet(GLUT.GLUT_ELAPSED_TIME)
-        GLUT.glutInitDisplayMode(GLUT.GLUT_DOUBLE | 
-                                 GLUT.GLUT_RGB | 
-                                 GLUT.GLUT_DEPTH)
-        GLUT.glutInitWindowSize(500,500)
-        GLUT.glutCreateWindow('Escape')
-        GLUT.glutDisplayFunc(self.onDraw)
-        GLUT.glutReshapeFunc(self.onSize)
+    def __init__(self, height, width):
+        self.height = height
+        self.width = width
 
-        self.init = 0
-        
-        self.worldmaxleft = 0
-        self.worldmaxright = worldWidth
-        self.worldmaxtop = worldHeight
-        self.worldmaxbottom = 0
-        
-        self.worldWidth = worldWidth
-        self.worldHeight = worldHeight
+        self.max_left = 0
+        self.max_right = width
+        self.max_bottom = 0
+        self.max_top = height
 
-        #initialized to actual values in setupView
-        self.viewport_left = 0
-        self.viewport_bottom = 0
-        self.viewport_height = 0
-        self.viewport_width = 0
-        
-        self.timeStep = 1
-        self.timeElapsed = self.time_interval / 1000.0
-        
-        self.jumpPoint = None
-        self.escapingFleet = None
-        self.pursuingFleet = None
-        self.shots = []
-        self.shotsByTarget = {}
-        
-        self.initWorld()
+        self.timeStep = 0
 
-    def start(self):
-        self.InitGL()
-        GLUT.glutTimerFunc(self.time_interval, self.handleTime, None)
-        GLUT.glutMainLoop()
-
-
-    def initWorld(self):
         self.jumpPoint = agents.Stationary(position=(90000, 90000),
                                            length=100,
                                            width=100,
@@ -70,7 +33,24 @@ class EscapeCanvas(object):
         pursuingMotherShip = self.pursuingFleet.getMotherShip()
         self.escapingFleet.startAllStateMachines()
         self.pursuingFleet.startAllStateMachines()
-    
+
+        self.shots = []
+        self.shotsByTarget = {}
+
+    def update(self,
+               timeElapsed):
+        self.timeStep += 1
+
+        for canvasElement in self.getAllCanvasElements():
+            if not canvasElement.active:
+                continue
+            canvasElement.update(timeStep=self.timeStep,
+                                 timeElapsed=timeElapsed)
+
+    def render(self):
+        for element in self.getAllCanvasElements():
+            element.draw()
+
     def getJumpPoint(self):
         return self.jumpPoint
     
@@ -98,7 +78,37 @@ class EscapeCanvas(object):
         target = shot.target
         self.shotsByTarget[target].remove(shot)
         
-    #hooks for pyOpenGL
+
+class EscapeCanvas(object):
+    def __init__(self,
+                 world):
+        self.world = world
+        self.time_interval = 10
+        GLUT.glutInit(sys.argv)
+        self.lastTime = GLUT.glutGet(GLUT.GLUT_ELAPSED_TIME)
+        GLUT.glutInitDisplayMode(GLUT.GLUT_DOUBLE | 
+                                 GLUT.GLUT_RGB | 
+                                 GLUT.GLUT_DEPTH)
+        GLUT.glutInitWindowSize(500,500)
+        GLUT.glutCreateWindow('Escape')
+        GLUT.glutDisplayFunc(self.render)
+        GLUT.glutReshapeFunc(self.onSize)
+
+        self.init = False
+        
+        #initialized to actual values in setupView
+        self.viewport_left = 0
+        self.viewport_bottom = 0
+        self.viewport_height = 0
+        self.viewport_width = 0
+        
+        self.timeStep = 1
+        self.timeElapsed = self.time_interval / 1000.0
+
+    def start(self):
+        self.InitGL()
+        GLUT.glutTimerFunc(self.time_interval, self.handleTime, None)
+        GLUT.glutMainLoop()
 
     def InitGL(self):
         """This function does some of the one time OpenGL initialization we need to perform. 
@@ -107,6 +117,7 @@ class EscapeCanvas(object):
         GL.glEnable(GL.GL_TEXTURE_2D)
         clientsize = self.getClientSizeTuple()
         self.setupView(clientsize[0], clientsize[1])
+        self.init = True
 
     #methods on this function
 
@@ -122,13 +133,13 @@ class EscapeCanvas(object):
         
         """
         
-        height = self.worldHeight 
-        width = self.worldWidth  
+        world_height = self.world.height 
+        world_width = self.world.width  
         
         #The ratio of the width to the height in the client-area
         screenratio = float(client_width) / float(client_height)
         
-        ratio = float(width) / float(height)
+        ratio = float(world_width) / float(world_height)
 
         if ratio >= screenratio:
         
@@ -155,32 +166,19 @@ class EscapeCanvas(object):
         
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        GLU.gluOrtho2D(self.worldmaxleft, 
-                       self.worldmaxright, 
-                       self.worldmaxbottom, 
-                       self.worldmaxtop)
+        GLU.gluOrtho2D(self.world.max_left, 
+                       self.world.max_right, 
+                       self.world.max_bottom, 
+                       self.world.max_top)
 
-    def onPaint(self,event):
-        """This function is called when the canvas recieves notice that it needs to repaint its surface. 
-        This just makes sure that OpenGL is inited and passes the work off to another function.
-        """
-        
-        dc = wx.PaintDC(self)
-        if not self.init:
-            self.InitGL()
-            self.init = 1
-        self.onDraw()
-    
-    def onDraw(self):
-        #self.SetCurrent()
+    def render(self):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)       
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
 
-        for element in self.getAllCanvasElements():
-            element.draw()
+        self.world.render()
+
         GLUT.glutSwapBuffers()
-        #self.setupView()
     
     def onSize(self,width,height):
         """ This function is called when a resize event occurs. The primary
@@ -190,21 +188,12 @@ class EscapeCanvas(object):
 
     def handleTime(self, value):
         currentTime = GLUT.glutGet(GLUT.GLUT_ELAPSED_TIME)
-        self.timeElapsed = (currentTime - self.lastTime) / 1000.0
+        timeElapsed = (currentTime - self.lastTime) / 1000.0
         self.lastTime = currentTime
 
-        self.timeStep += 1
-        for canvasElement in self.getAllCanvasElements():
-            if not canvasElement.active:
-                continue
-            canvasElement.update(timeStep=self.timeStep,
-                                 timeElapsed=self.timeElapsed)
-        self.onDraw()
+        self.world.update(timeElapsed=timeElapsed)
+        
+        self.render()
 
         GLUT.glutTimerFunc(self.time_interval, self.handleTime, None)
         
-    def getWorldWidth(self):
-        return self.worldWidth
-    
-    def getWorldHeight(self):
-        return self.worldHeight

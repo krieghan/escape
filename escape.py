@@ -3,9 +3,10 @@ import optparse
 import canvas
 
 def run():
-    world = canvas.EscapeCanvas(worldHeight=100000,
-                                worldWidth=100000)
-    world.start()
+    world = canvas.EscapeWorld(height=100000,
+                               width=100000)
+    escape_canvas = canvas.EscapeCanvas(world=world)
+    escape_canvas.start()
 
 
 if __name__ == "__main__":
