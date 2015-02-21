@@ -1,4 +1,5 @@
 import sys
+import time
 
 from OpenGL import GL, GLU, GLUT
 
@@ -38,14 +39,14 @@ class EscapeWorld(object):
         self.shotsByTarget = {}
 
     def update(self,
+               currentTime,
                timeElapsed):
         self.timeStep += 1
 
         for canvasElement in self.getAllCanvasElements():
             if not canvasElement.active:
                 continue
-            canvasElement.update(timeStep=self.timeStep,
-                                 timeElapsed=timeElapsed)
+            canvasElement.update(timeElapsed=timeElapsed)
 
     def render(self):
         for element in self.getAllCanvasElements():

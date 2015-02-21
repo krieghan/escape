@@ -41,9 +41,9 @@ class Ship(object):
         self.velocity = velocity
         self.color = color
         self.normalColor = color
-        self.turnsUntilNormalColor = 0
-        self.turnsUntilNextLaunch = 0
-        self.turnsBetweenLaunches = 300
+        self.timeOfNormalColor = None
+        self.timeOfNextLaunch = None
+        self.msBetweenLaunches = 3000
         self.maxSpeed = maxSpeed
         self.throttleSpeed = maxSpeed
         self.maxForce = maxForce
@@ -143,13 +143,15 @@ class Ship(object):
         self.setTarget(self.targetingSystem.acquireTarget(self))
         return self.target
     
-    def launch(self):
+    def launch(self,
+               current_time):
         if not self.flightGroups:
             return
         
-        if self.turnsUntilNextLaunch > 0:
-            self.turnsUntilNextLaunch -= 1
+        if current_time < timeOfNextLaunch:
             return
+        else:
+            timeOfNextLaunch = current_time + self.msBetweenLaunches
         
         desiredNumberOfFriendlyBombers = 1
         desiredNumberOfFriendlyFighters = 1
@@ -191,7 +193,6 @@ class Ship(object):
         self.removeFlightGroup(groupToLaunch)
         fleet.addFlightGroups([groupToLaunch])
         groupToLaunch.startStateMachine()
-        self.turnsUntilNextLaunch = self.turnsBetweenLaunches
         
     def engageThrottle(self,
                        speed):
@@ -202,13 +203,14 @@ class Ship(object):
         
     
     def update(self,
-               timeStep,
+               current_time,
                timeElapsed):
-        if self.turnsUntilNormalColor > 0:
-            self.turnsUntilNormalColor -= 1
+        if current_time < self.timeOfNormalColor:
             self.color = (random.random(), random.random(), random.random())
         else:
+            self.timeOfNormalColor = None
             self.color = self.normalColor
+
         canvas = self.canvas
         maxspeed = self.maxSpeed
         throttlespeed = self.throttleSpeed
@@ -219,8 +221,7 @@ class Ship(object):
         for turret in self.turrets:
             turret.update()
             
-        self.launch()
-
+        self.launch(current_time)
         
         force = self.steeringController.calculate()
         force = vector.truncate(vectorTuple=force,
@@ -347,7 +348,7 @@ class Ship(object):
         enemyFleet = fleet.getEnemyFleet()
         if shot.fromTurret.owner.fleet == fleet:
             fleet.instancesOfFriendlyFire += 1
-        self.turnsUntilNormalColor = 3
+        self.timeOfNormalColor = world.current_time + self.msOfShotColor
         self.health -= shot.damage
         
         for observer in self.observers:
