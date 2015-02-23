@@ -17,8 +17,8 @@ class EscapeToJumpPoint(object):
     def enter(cls,
               owner):
         steeringController = owner.getSteeringController()
-        canvas = owner.canvas
-        jumpPoint = canvas.getJumpPoint()
+        world = owner.world
+        jumpPoint = world.getJumpPoint()
         steeringController.activate('arrive',
                                     jumpPoint.getPosition(),
                                     .6)
@@ -276,6 +276,6 @@ def isUnderAttack(owner):
     return bool(gunsTargetingOwner)
     
 def shotsFiredAtMe(owner):
-    canvas = owner.canvas
-    shots = canvas.shotsByTarget.get(owner, [])
+    world = owner.world
+    shots = world.shotsByTarget.get(owner, [])
     return shots

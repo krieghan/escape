@@ -176,7 +176,7 @@ class FlightGroup(object):
             
 def createFighterTurret(owner,
                         offset):
-    rechargeTime = 15
+    rechargeTime = 300
     turret = agents.Turret(owner=owner,
                            rechargeTime=rechargeTime,
                            firingRange=10000,
@@ -190,7 +190,7 @@ def createFighterTurret(owner,
 
 def createLaserTurret(owner,
                       offset):
-    rechargeTime = 25
+    rechargeTime = 500
     turret = agents.Turret(owner=owner,
                            rechargeTime=rechargeTime,
                            firingRange=10000,
@@ -204,7 +204,7 @@ def createLaserTurret(owner,
 
 def createLauncher(owner,
                    offset):
-    rechargeTime = 300
+    rechargeTime = 3000
     launcher = agents.Turret(owner=owner,
                              rechargeTime=rechargeTime,
                              firingRange=20000,
@@ -218,7 +218,7 @@ def createLauncher(owner,
 
 
 def createBomber(fleet,
-                 canvas,
+                 world,
                  carryOutMission,
                  globalState):
     length = 1000
@@ -229,7 +229,7 @@ def createBomber(fleet,
                          width=width,
                          velocity=(0, 1),
                          color=color,
-                         canvas=canvas,
+                         world=world,
                          render=render.drawBomber,
                          mass=3,
                          maxSpeed=50,
@@ -246,7 +246,7 @@ def createBomber(fleet,
     return bomber
 
 def createInterceptor(fleet,
-                      canvas,
+                      world,
                       carryOutMission,
                       globalState):
     length = 1000
@@ -257,7 +257,7 @@ def createInterceptor(fleet,
                               width=width,
                               velocity=(0, 1),
                               color=color,
-                              canvas=canvas,
+                              world=world,
                               render=render.drawInterceptor,
                               mass=3,
                               maxSpeed=100,
@@ -274,7 +274,7 @@ def createInterceptor(fleet,
     return interceptor
 
 def createFighter(fleet,
-                  canvas,
+                  world,
                   carryOutMission,
                   globalState):
     length = 1000
@@ -285,7 +285,7 @@ def createFighter(fleet,
                           width=width,
                           velocity=(0, 1),
                           color=color,
-                          canvas=canvas,
+                          world=world,
                           render=render.drawFighter,
                           mass=3,
                           maxSpeed=100,
@@ -302,23 +302,23 @@ def createFighter(fleet,
     return fighter
 
 def createInterceptorFlightGroup(fleet,
-                                 canvas):
+                                 world):
     globalState = goalStates.FighterGlobalState
     carryOutMission = goalStates.DestroyGreatestThreatToMothership
     interceptor1 = createInterceptor(fleet=fleet,
-                                     canvas=canvas,
+                                     world=world,
                                      carryOutMission=carryOutMission,
                                      globalState=globalState)
     interceptor2 = createInterceptor(fleet=fleet,
-                                     canvas=canvas,
+                                     world=world,
                                      carryOutMission=carryOutMission,
                                      globalState=globalState)
     interceptor3 = createInterceptor(fleet=fleet,
-                                     canvas=canvas,
+                                     world=world,
                                      carryOutMission=carryOutMission,
                                      globalState=globalState)
     interceptor4 = createInterceptor(fleet=fleet,
-                                     canvas=canvas,
+                                     world=world,
                                      carryOutMission=carryOutMission,
                                      globalState=globalState)
     interceptorGroup = FlightGroup(fleet=fleet,
@@ -333,23 +333,23 @@ def createInterceptorFlightGroup(fleet,
     return interceptorGroup
 
 def createBomberFlightGroup(fleet,
-                            canvas):
+                            world):
     carryOutMission = goalStates.DestroyClosestEnemyCapitalShip
     globalState = goalStates.FighterGlobalState
     bomber1 = createBomber(fleet=fleet,
-                           canvas=canvas,
+                           world=world,
                            carryOutMission=carryOutMission,
                            globalState=globalState)
     bomber2 = createBomber(fleet=fleet,
-                           canvas=canvas,
+                           world=world,
                            carryOutMission=carryOutMission,
                            globalState=globalState)
     bomber3 = createBomber(fleet=fleet,
-                           canvas=canvas,
+                           world=world,
                            carryOutMission=carryOutMission,
                            globalState=globalState)
     bomber4 = createBomber(fleet=fleet,
-                           canvas=canvas,
+                           world=world,
                            carryOutMission=carryOutMission,
                            globalState=globalState)
     bomberGroup = FlightGroup(fleet=fleet,
@@ -365,23 +365,23 @@ def createBomberFlightGroup(fleet,
     
 
 def createFighterFlightGroup(fleet,
-                             canvas):
+                             world):
     carryOutMission = goalgoalStates.DestroyClosestEnemyFighter
     globalState = goalStates.FighterGlobalState
     fighter1 = createFighter(fleet=fleet,
-                             canvas=canvas,
+                             world=world,
                              carryOutMission=carryOutMission,
                              globalState=globalState)
     fighter2 = createFighter(fleet=fleet,
-                             canvas=canvas,
+                             world=world,
                              carryOutMission=carryOutMission,
                              globalState=globalState)
     fighter3 = createFighter(fleet=fleet,
-                             canvas=canvas,
+                             world=world,
                              carryOutMission=carryOutMission,
                              globalState=globalState)
     fighter4 = createFighter(fleet=fleet,
-                             canvas=canvas,
+                             world=world,
                              carryOutMission=carryOutMission,
                              globalState=globalState)
     fighterGroup = FlightGroup(fleet=fleet,
@@ -398,7 +398,7 @@ def createFighterFlightGroup(fleet,
 
 def createMotherShip(name,
                      fleet,
-                     canvas,
+                     world,
                      position,
                      carryOutMission):
     color = fleet.getFleetColor()
@@ -410,7 +410,7 @@ def createMotherShip(name,
                     width=width,
                     velocity=(0, 1),
                     color=color,
-                    canvas=canvas,
+                    world=world,
                     render=render.drawMotherShip,
                     mass=50,
                     maxSpeed=5,
@@ -448,17 +448,17 @@ def createMotherShip(name,
 def addFlightGroupsToHangar(howMany,
                             factory,
                             fleet,
-                            canvas,
+                            world,
                             motherShip):
     groups = []
     for i in range(howMany):
         flightGroup = factory(fleet=fleet,
-                              canvas=canvas)
+                              world=world)
         groups.append(flightGroup)
         
     motherShip.addFlightGroupsToHangar(groups)
 
-def createEscapingFleet(canvas):
+def createEscapingFleet(world):
     fleetColor = (0, 0, 1)
     flightGroupNames = ["Red", "Green", "Blue", "Scarlet", "Gold", "Yellow"]
     escapingFleet = Fleet(fleetColor=fleetColor,
@@ -466,25 +466,25 @@ def createEscapingFleet(canvas):
                           flightGroupNames=flightGroupNames)
     escapingMotherShip = createMotherShip("Jagged Edge",
                                           escapingFleet,
-                                          canvas,
+                                          world=world,
                                           position=(30000, 30000),
                                           carryOutMission=goalStates.EscapeToJumpPoint)
     
     addFlightGroupsToHangar(howMany=20,
                             factory=createBomberFlightGroup,
                             fleet=escapingFleet,
-                            canvas=canvas,
+                            world=world,
                             motherShip=escapingMotherShip)
     addFlightGroupsToHangar(howMany=20,
                             factory=createInterceptorFlightGroup,
                             fleet=escapingFleet,
-                            canvas=canvas,
+                            world=world,
                             motherShip=escapingMotherShip)
     
     escapingFleet.setMotherShip(escapingMotherShip)
     return escapingFleet
 
-def createPursuingFleet(canvas):
+def createPursuingFleet(world):
     fleetColor = (1, 0, 0)
     flightGroupNames = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta"]
     pursuingFleet = Fleet(fleetColor=fleetColor,
@@ -492,18 +492,18 @@ def createPursuingFleet(canvas):
                           flightGroupNames=flightGroupNames)
     pursuingMotherShip = createMotherShip("Dark Soul",
                                           pursuingFleet,
-                                          canvas,
+                                          world,
                                           position=(12000, 12000),
                                           carryOutMission=goalStates.AttackEscapingMothership)
     addFlightGroupsToHangar(howMany=20,
                             factory=createBomberFlightGroup,
                             fleet=pursuingFleet,
-                            canvas=canvas,
+                            world=world,
                             motherShip=pursuingMotherShip)
     addFlightGroupsToHangar(howMany=20,
                             factory=createInterceptorFlightGroup,
                             fleet=pursuingFleet,
-                            canvas=canvas,
+                            world=world,
                             motherShip=pursuingMotherShip)
     pursuingFleet.setMotherShip(pursuingMotherShip)
     return pursuingFleet

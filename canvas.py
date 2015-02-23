@@ -16,7 +16,7 @@ class EscapeWorld(object):
         self.max_bottom = 0
         self.max_top = height
 
-        self.timeStep = 0
+        self.current_time = 0
 
         self.jumpPoint = agents.Stationary(position=(90000, 90000),
                                            length=100,
@@ -24,8 +24,8 @@ class EscapeWorld(object):
                                            render=render.drawJumpPoint,
                                            color=(1, 1, 1))
         
-        self.escapingFleet = fleets.createEscapingFleet(canvas=self)
-        self.pursuingFleet = fleets.createPursuingFleet(canvas=self)
+        self.escapingFleet = fleets.createEscapingFleet(world=self)
+        self.pursuingFleet = fleets.createPursuingFleet(world=self)
         
         self.escapingFleet.setEnemyFleet(self.pursuingFleet)
         self.pursuingFleet.setEnemyFleet(self.escapingFleet)
@@ -39,10 +39,11 @@ class EscapeWorld(object):
         self.shotsByTarget = {}
 
     def update(self,
-               currentTime,
-               timeElapsed):
-        self.timeStep += 1
-
+               currentTime):
+        if not self.current_time:
+            self.current_time = currentTime
+        timeElapsed = (currentTime - self.current_time)
+        self.current_time = currentTime
         for canvasElement in self.getAllCanvasElements():
             if not canvasElement.active:
                 continue
@@ -189,10 +190,7 @@ class EscapeCanvas(object):
 
     def handleTime(self, value):
         currentTime = GLUT.glutGet(GLUT.GLUT_ELAPSED_TIME)
-        timeElapsed = (currentTime - self.lastTime) / 1000.0
-        self.lastTime = currentTime
-
-        self.world.update(timeElapsed=timeElapsed)
+        self.world.update(currentTime=currentTime)
         
         self.render()
 

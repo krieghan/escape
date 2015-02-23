@@ -19,7 +19,7 @@ class Ship(object):
                  velocity,
                  color,
                  render,
-                 canvas,
+                 world,
                  mass,
                  maxSpeed,
                  maxForce,
@@ -44,10 +44,11 @@ class Ship(object):
         self.timeOfNormalColor = None
         self.timeOfNextLaunch = None
         self.msBetweenLaunches = 3000
+        self.msOfShotColor = 200
         self.maxSpeed = maxSpeed
         self.throttleSpeed = maxSpeed
         self.maxForce = maxForce
-        self.canvas = canvas
+        self.world = world
         self.targetingSystem = targetingSystem
         self.steeringController = steeringcontroller.SteeringController(agent=self)
         self.mission = mission
@@ -92,7 +93,7 @@ class Ship(object):
         self.totalHealth = health
         
         '''
-        debugObserver = canvas.frame.childFrames.get('%sDebug' % fleet.teamName)
+        debugObserver = world.frame.childFrames.get('%sDebug' % fleet.teamName)
         self.observers = [debugObserver]
         '''
         self.observers = []
@@ -143,15 +144,15 @@ class Ship(object):
         self.setTarget(self.targetingSystem.acquireTarget(self))
         return self.target
     
-    def launch(self,
-               current_time):
+    def launch(self):
+        current_time = self.world.current_time
         if not self.flightGroups:
             return
         
-        if current_time < timeOfNextLaunch:
+        if current_time < self.timeOfNextLaunch:
             return
         else:
-            timeOfNextLaunch = current_time + self.msBetweenLaunches
+            self.timeOfNextLaunch = current_time + self.msBetweenLaunches
         
         desiredNumberOfFriendlyBombers = 1
         desiredNumberOfFriendlyFighters = 1
@@ -203,15 +204,15 @@ class Ship(object):
         
     
     def update(self,
-               current_time,
                timeElapsed):
-        if current_time < self.timeOfNormalColor:
+        current_time = self.world.current_time
+        if self.timeOfNormalColor and current_time < self.timeOfNormalColor:
             self.color = (random.random(), random.random(), random.random())
-        else:
+        elif self.timeOfNormalColor:
             self.timeOfNormalColor = None
             self.color = self.normalColor
 
-        canvas = self.canvas
+        world = self.world
         maxspeed = self.maxSpeed
         throttlespeed = self.throttleSpeed
         maxforce = self.maxForce
@@ -221,7 +222,7 @@ class Ship(object):
         for turret in self.turrets:
             turret.update()
             
-        self.launch(current_time)
+        self.launch()
         
         force = self.steeringController.calculate()
         force = vector.truncate(vectorTuple=force,
@@ -343,12 +344,12 @@ class Ship(object):
 
     def hitBy(self,
               shot):
-        canvas = self.canvas
+        current_time = self.world.current_time
         fleet = self.fleet
         enemyFleet = fleet.getEnemyFleet()
         if shot.fromTurret.owner.fleet == fleet:
             fleet.instancesOfFriendlyFire += 1
-        self.timeOfNormalColor = world.current_time + self.msOfShotColor
+        self.timeOfNormalColor = current_time + self.msOfShotColor
         self.health -= shot.damage
         
         for observer in self.observers:
@@ -400,7 +401,7 @@ class Turret(object):
         self.rechargeTime = rechargeTime
         self.offset = offset
         self.target = None
-        self.lastFired = 0
+        self.timeRecharged = None
         self.firingRange = firingRange
         self.firingRangeSquared = firingRange * firingRange
         self.position = None
@@ -593,8 +594,8 @@ class Turret(object):
     
     def readyToFire(self):
         owner = self.owner
-        canvas = owner.canvas
-        if canvas.timeStep >= self.lastFired + self.rechargeTime:
+        world = owner.world
+        if self.timeRecharged is None or world.current_time >= self.timeRecharged:
             return True
         
         return False
@@ -622,7 +623,7 @@ class Turret(object):
     def fire(self,
              target):
         owner = self.owner
-        canvas = owner.canvas
+        world = owner.world
         position = self.getPosition()
         speed = owner.getSpeed()
         shotSpeed = speed + self.shotSpeed
@@ -643,11 +644,11 @@ class Turret(object):
                     height=self.shotHeight,
                     width=self.shotWidth,
                     color=(1, 1, 1),
-                    canvas=canvas,
+                    world=world,
                     damage=self.damage,
                     target=target)
-        canvas.addShot(shot)
-        self.lastFired = canvas.timeStep
+        world.addShot(shot)
+        self.timeRecharged = world.current_time + self.rechargeTime
 
 verify.verifyClass(interfaces.Renderable, Turret)
 
@@ -664,7 +665,7 @@ class Shot(object):
                  width,
                  color,
                  render,
-                 canvas,
+                 world,
                  damage,
                  target):
         self.velocity = velocity
@@ -675,7 +676,7 @@ class Shot(object):
         self.height = height
         self.width = width
         self.color = color
-        self.canvas = canvas
+        self.world = world
         self.fromTurret = fromTurret
         self.damage = damage
         self.target = target
@@ -683,10 +684,10 @@ class Shot(object):
     
     
     def hit(self):
-        canvas = self.canvas
+        world = self.world
         owner = self.fromTurret.owner
         shotPosition = self.position
-        for ship in canvas.getAllShips():
+        for ship in world.getAllShips():
             if owner == ship:
                 continue
             if ship.intersectsPoint(shotPosition):
@@ -695,14 +696,13 @@ class Shot(object):
         return None
     
     def update(self,
-               timeStep,
                timeElapsed):
-        canvas = self.canvas
+        world = self.world
         currentPosition = self.position
         shipHit = self.hit()
         if shipHit:
             shipHit.hitBy(self)
-            canvas.removeShot(self)
+            world.removeShot(self)
             self.active = False
             return
         
@@ -715,7 +715,7 @@ class Shot(object):
         
         
         if distanceSquaredFromOrigin > self.maxDistanceSquared:
-            canvas.removeShot(self)
+            world.removeShot(self)
             return
         
         (x, y) = calculate.addPointAndVector(currentPosition,
@@ -777,7 +777,6 @@ class Stationary(object):
         return self.position
 
     def update(self,
-               timeStep,
                timeElapsed):
         pass
     
