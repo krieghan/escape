@@ -229,7 +229,7 @@ class Ship(object):
                                 cap=maxforce)
         
         acceleration = calculate.multiplyVectorAndScalar(vector=force,
-                                                         scalar=timeElapsed / self.mass)
+                                                         scalar=timeElapsed / (self.mass * 1000.0))
         
         velocity = calculate.addVectors(self.velocity,
                                         acceleration)
