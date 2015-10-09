@@ -1,6 +1,11 @@
 import random
-import agents, render, goalStates, statemachine, targetingsystem
-from twodee.geometry import (calculate)
+from escape import (
+        agents, 
+        render, 
+        goalStates, 
+        targetingsystem)
+from game_common.twodee.geometry import (calculate)
+from game_common import statemachine
 
 def getFleetReport(fleet):
     report = []

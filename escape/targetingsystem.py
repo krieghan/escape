@@ -1,5 +1,6 @@
-from twodee.geometry import (calculate,
-                             vector)
+from game_common.twodee.geometry import (
+                         calculate,
+                         vector)
 
 class NoTargeting:
     @classmethod

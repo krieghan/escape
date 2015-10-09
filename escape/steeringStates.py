@@ -1,26 +1,15 @@
 from zope.interface import implements, verify
 
-import statemachine
-import goalStates
-
-from twodee.geometry import (calculate,
+from game_common import statemachine
+from game_common.twodee.geometry import (
+                             calculate,
                              convert,
                              vector)
-
-
-
-    
-
-
         
 #Dive & Break (for fighters)
         
-        
 breakThresholdSquared = 10000 ** 2
 diveThresholdSquared = 1000 ** 2
-
-
-
 
 def plotLocalRouteAroundTarget(owner,
                                target):
@@ -63,8 +52,10 @@ def plotLocalRouteAroundTarget(owner,
         pathPoint = pathPoints[index]
         ownerToPathPoint = calculate.subtractPoints(pathPoint,
                                                     ownerLocalPosition)
-        distanceSquaredToPathPoint = vector.getMagnitudeSquared(ownerToPathPoint)
-        if closestDistanceSquared is None or distanceSquaredToPathPoint < closestDistanceSquared:
+        distanceSquaredToPathPoint =\
+            vector.getMagnitudeSquared(ownerToPathPoint)
+        if (closestDistanceSquared is None or 
+            distanceSquaredToPathPoint < closestDistanceSquared):
             closestIndex = index
             closestDistanceSquared = distanceSquaredToPathPoint
             
@@ -298,6 +289,7 @@ class Break(object):
     @classmethod
     def execute(cls,
                 owner):
+        from escape import goalStates
         steeringStateMachine = owner.steeringStateMachine
         target = owner.getTarget() or cls.acquireTarget(owner)
         if target is None:

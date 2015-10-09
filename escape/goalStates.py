@@ -1,9 +1,10 @@
 from zope.interface import implements, verify
 
-import statemachine
-import targetingsystem, steeringStates
+from game_common import statemachine
+from escape import targetingsystem, steeringStates
 
-from twodee.geometry import (calculate,
+from game_common.twodee.geometry import (
+                             calculate,
                              convert,
                              vector)
 
@@ -34,8 +35,6 @@ class EscapeToJumpPoint(object):
         pass
     
 verify.verifyClass(statemachine.IState, EscapeToJumpPoint)
-
-
 
 #Attackers
 class AttackPursuingMotherShip(object):

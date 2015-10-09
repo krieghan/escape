@@ -1,12 +1,13 @@
 import math, random
 from zope.interface import implements, verify
 
-import interfaces, statemachine
-from twodee.geometry import (calculate,
-                             vector,
-                             convert)
-from twodee.steering import steeringcontroller
-import render
+from game_common import interfaces, statemachine
+from game_common.twodee.geometry import (
+                         calculate,
+                         vector,
+                         convert)
+from game_common.twodee.steering import steeringcontroller
+from escape import render
 
 class Ship(object):
     

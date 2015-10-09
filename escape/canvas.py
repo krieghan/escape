@@ -3,7 +3,7 @@ import time
 
 from OpenGL import GL, GLU, GLUT
 
-import agents, render, fleets
+from escape import agents, render, fleets
 
 class EscapeWorld(object):
 

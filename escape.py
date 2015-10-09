@@ -1,6 +1,6 @@
 import optparse
 
-import canvas
+from escape import canvas
 
 def run():
     world = canvas.EscapeWorld(height=100000,
