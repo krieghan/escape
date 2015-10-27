@@ -11,7 +11,9 @@ from escape import render
 
 class Ship(object):
     
-    implements(interfaces.Steerable)
+    implements([
+        interfaces.Steerable,
+        interfaces.Observable])
     
     def __init__(self,
                  position,
@@ -53,14 +55,16 @@ class Ship(object):
         self.targetingSystem = targetingSystem
         self.steeringController = steeringcontroller.SteeringController(agent=self)
         self.mission = mission
-        self.steeringStateMachine = statemachine.StateMachine(owner=self,
-                                                              currentState=None,
-                                                              globalState=None,
-                                                              name='steering')
-        self.goalStateMachine = statemachine.StateMachine(owner=self,
-                                                          currentState=startingState,
-                                                          globalState=globalState,
-                                                          name='goal')
+        self.steeringStateMachine = statemachine.StateMachine(
+                owner=self,
+                currentState=None,
+                globalState=None,
+                name='steering')
+        self.goalStateMachine = statemachine.StateMachine(
+                owner=self,
+                currentState=startingState,
+                globalState=globalState,
+                name='goal')
         self.stateMachines = [self.goalStateMachine, self.steeringStateMachine]
         self.flightGroup = flightGroup
         self.target = None
@@ -100,6 +104,9 @@ class Ship(object):
         self.observers = []
         
         
+    def getObservers(self):
+        return self.observers
+
     def getActive(self):
         return self.active
     
@@ -385,6 +392,7 @@ class Ship(object):
             return True
 
 verify.verifyClass(interfaces.Steerable, Ship)
+verify.verifyClass(interfaces.Observable, Ship)
     
     
 class Turret(object):
