@@ -11,7 +11,9 @@ from escape import render
 
 class Ship(object):
     
-    implements(interfaces.Steerable)
+    implements([
+        interfaces.Steerable,
+        interfaces.Observable])
     
     def __init__(self,
                  position,
@@ -53,14 +55,16 @@ class Ship(object):
         self.targetingSystem = targetingSystem
         self.steeringController = steeringcontroller.SteeringController(agent=self)
         self.mission = mission
-        self.steeringStateMachine = statemachine.StateMachine(owner=self,
-                                                              currentState=None,
-                                                              globalState=None,
-                                                              name='steering')
-        self.goalStateMachine = statemachine.StateMachine(owner=self,
-                                                          currentState=startingState,
-                                                          globalState=globalState,
-                                                          name='goal')
+        self.steeringStateMachine = statemachine.StateMachine(
+                owner=self,
+                currentState=None,
+                globalState=None,
+                name='steering')
+        self.goalStateMachine = statemachine.StateMachine(
+                owner=self,
+                currentState=startingState,
+                globalState=globalState,
+                name='goal')
         self.stateMachines = [self.goalStateMachine, self.steeringStateMachine]
         self.flightGroup = flightGroup
         self.target = None
@@ -100,6 +104,12 @@ class Ship(object):
         self.observers = []
         
         
+    def getObservers(self):
+        return self.observers
+
+    def getActive(self):
+        return self.active
+    
     def draw(self):
         self.render(self)
     
@@ -221,7 +231,7 @@ class Ship(object):
         for stateMachine in self.stateMachines:
             stateMachine.update()
         for turret in self.turrets:
-            turret.update()
+            turret.update(timeElapsed)
             
         self.launch()
         
@@ -382,6 +392,7 @@ class Ship(object):
             return True
 
 verify.verifyClass(interfaces.Steerable, Ship)
+verify.verifyClass(interfaces.Observable, Ship)
     
     
 class Turret(object):
@@ -420,6 +431,12 @@ class Turret(object):
     
     def getWidth(self):
         return 0
+
+    def draw(self):
+        pass
+
+    def getActive(self):
+        pass
         
     def updatePosition(self):
         owner = self.owner
@@ -543,11 +560,10 @@ class Turret(object):
             self.fire(gunTarget)
             
         
-    def update(self):
+    def update(self, timeElapsed):
         self.obstructed = False
         self.updatePosition()
         self.handleTargettingAndFiring()
-        
          
     def haveClearShotOfTarget(self,
                               target):
@@ -684,6 +700,9 @@ class Shot(object):
         self.active = True
     
     
+    def getActive(self):
+        return self.active
+
     def hit(self):
         world = self.world
         owner = self.fromTurret.owner
@@ -771,6 +790,9 @@ class Stationary(object):
         self.color = color
         self.active = True
         
+    def getActive(self):
+        return self.active
+
     def draw(self):
         self.render(self)
         
