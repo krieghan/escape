@@ -1,11 +1,13 @@
 import optparse
 
-from escape import canvas
+from game_common import canvas
+
+from escape import world
 
 def run():
-    world = canvas.EscapeWorld(height=100000,
+    escape_world = world.EscapeWorld(height=100000,
                                width=100000)
-    escape_canvas = canvas.EscapeCanvas(world=world)
+    escape_canvas = canvas.Canvas(world=escape_world)
     escape_canvas.start()
 
 
