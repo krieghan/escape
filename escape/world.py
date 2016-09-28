@@ -43,6 +43,15 @@ class EscapeWorld(object):
         self.shots = []
         self.shotsByTarget = {}
 
+    def getHeightWidth(self):
+        return (self.height, self.width)
+
+    def getMaxLeftRightBottomTop(self):
+        return (self.max_left,
+                self.max_right,
+                self.max_bottom,
+                self.max_top)
+
     def start(self):
         pass
 
