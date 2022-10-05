@@ -3,15 +3,13 @@ import time
 
 from OpenGL import GL, GLU, GLUT
 from game_common import interfaces
-import zope.interface
-import zope.interface.verify
+from zope.interface import implementer, verify
 
 from escape import agents, render, fleets
 
+
+@implementer(interfaces.IWorld)
 class EscapeWorld(object):
-
-    zope.interface.implements(interfaces.IWorld)
-
     def __init__(self, height, width):
         self.height = height
         self.width = width
@@ -87,9 +85,10 @@ class EscapeWorld(object):
                 shot):
         self.shots.append(shot)
         target = shot.target
-        if not self.shotsByTarget.has_key(target):
-            self.shotsByTarget[target] = []
-        self.shotsByTarget[target].append(shot)
+        shots_for_target = self.shotsByTarget.get(target)
+        if shots_for_target is None:
+            shots_for_target = self.shotsByTarget[target] = []
+        shots_for_target.append(shot)
         
     def removeShot(self,
                    shot):
@@ -97,4 +96,5 @@ class EscapeWorld(object):
         target = shot.target
         self.shotsByTarget[target].remove(shot)
         
-#zope.interface.verify.verifyClass(interfaces.IWorld, EscapeWorld)
+
+verify.verifyClass(interfaces.IWorld, EscapeWorld)

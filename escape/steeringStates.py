@@ -1,4 +1,5 @@
-from zope.interface import implements, verify
+import zope.interface
+from zope.interface import verify
 
 from game_common import statemachine
 from game_common.twodee.geometry import (
@@ -72,11 +73,8 @@ def plotLocalRouteAroundTarget(owner,
                                 closed=True)
 
 
-
-
+@zope.interface.implementer(statemachine.IState)
 class FindClearShot(object):
-    
-    implements(statemachine.IState)
     
     stateCluster = 'Attack'
     
@@ -158,9 +156,8 @@ def withinFiringRange(owner,
         return False
         
 
+@zope.interface.implementer(statemachine.IState)
 class Cruise(object):
-    
-    implements(statemachine.IState)
     
     @classmethod
     def getTarget(cls,
@@ -208,9 +205,8 @@ class Cruise(object):
 verify.verifyClass(statemachine.IState, Cruise)
 
 
+@zope.interface.implementer(statemachine.IState)
 class Dive(object):
-    implements(statemachine.IState)
-    
     stateCluster = 'Attack'
     
     @classmethod
@@ -263,9 +259,9 @@ class Dive(object):
         
 verify.verifyClass(statemachine.IState, Dive)
 
-        
+    
+@zope.interface.implementer(statemachine.IState)
 class Break(object):
-    implements(statemachine.IState)
     
     stateCluster = 'Attack'
     

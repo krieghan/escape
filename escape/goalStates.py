@@ -1,4 +1,4 @@
-from zope.interface import implements, verify
+from zope.interface import implementer, verify
 
 from game_common import statemachine
 from escape import targetingsystem, steeringStates
@@ -10,10 +10,8 @@ from game_common.twodee.geometry import (
 
 #Defenders
 
+@implementer(statemachine.IState)
 class EscapeToJumpPoint(object):
-    
-    implements(statemachine.IState)
-    
     @classmethod
     def enter(cls,
               owner):
@@ -37,9 +35,9 @@ class EscapeToJumpPoint(object):
 verify.verifyClass(statemachine.IState, EscapeToJumpPoint)
 
 #Attackers
+
+@implementer(statemachine.IState)
 class AttackPursuingMotherShip(object):
-    
-    implements(statemachine.IState)
     
     @classmethod
     def enter(cls,
@@ -65,10 +63,8 @@ class AttackPursuingMotherShip(object):
 verify.verifyClass(statemachine.IState, AttackPursuingMotherShip)
 
 
+@implementer(statemachine.IState)
 class FighterGlobalState(object):
-    
-    implements(statemachine.IState)
-    
     @classmethod
     def enter(cls,
               owner):
@@ -129,10 +125,8 @@ class FighterGlobalState(object):
              owner):
         pass
 
+@implementer(statemachine.IState)
 class EvadeAttack(object):
-    
-    implements(statemachine.IState)
-    
     @classmethod
     def enter(cls,
               owner):
@@ -150,10 +144,10 @@ class EvadeAttack(object):
 
 verify.verifyClass(statemachine.IState, FighterGlobalState)
 
+
+@implementer(statemachine.IState)
 class EscortMotherShip(object):
     
-    implements(statemachine.IState)
-        
     @classmethod
     def enter(cls,
               owner):
@@ -180,10 +174,9 @@ class EscortMotherShip(object):
 
 verify.verifyClass(statemachine.IState, EscortMotherShip)
 
+
+@implementer(statemachine.IState)
 class FlightGroupState(object):
-    
-    implements(statemachine.IState)
-    
     @classmethod
     def enter(cls,
               owner):
@@ -201,9 +194,9 @@ class FlightGroupState(object):
         
 verify.verifyClass(statemachine.IState, FlightGroupState)
 
+
+@implementer(statemachine.IState)
 class DestroyEnemyShip(object):
-    implements(statemachine.IState)
-    
     @classmethod
     def enter(cls,
               owner):
@@ -235,9 +228,9 @@ class DestroyGreatestThreatToMothership(DestroyEnemyShip):
 class AttackEscapingMothership(DestroyEnemyShip):
     targetingSystemClass = targetingsystem.TargetEnemyMotherShip
     
+
+@implementer(statemachine.IState)
 class ReturnToMotherShip(object):
-    implements(statemachine.IState)
-    
     @classmethod
     def enter(cls,
               owner):

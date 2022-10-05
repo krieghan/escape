@@ -1,5 +1,4 @@
 import math, random
-from zope.interface import implements, verify
 
 from game_common import interfaces, statemachine
 from game_common.twodee.geometry import (
@@ -7,14 +6,14 @@ from game_common.twodee.geometry import (
                          vector,
                          convert)
 from game_common.twodee.steering import steeringcontroller
+from zope.interface import implementer, verify
+
+
 from escape import render
 
+
+@implementer(interfaces.Steerable, interfaces.Observable)
 class Ship(object):
-    
-    implements([
-        interfaces.Steerable,
-        interfaces.Observable])
-    
     def __init__(self,
                  position,
                  length,
@@ -160,7 +159,7 @@ class Ship(object):
         if not self.flightGroups:
             return
         
-        if current_time < self.timeOfNextLaunch:
+        if self.timeOfNextLaunch is not None and current_time < self.timeOfNextLaunch:
             return
         else:
             self.timeOfNextLaunch = current_time + self.msBetweenLaunches
@@ -395,10 +394,8 @@ verify.verifyClass(interfaces.Steerable, Ship)
 verify.verifyClass(interfaces.Observable, Ship)
     
     
+@implementer(interfaces.Renderable)
 class Turret(object):
-    
-    implements(interfaces.Renderable)
-    
     def __init__(self,
                  owner,
                  rechargeTime,
@@ -669,10 +666,9 @@ class Turret(object):
 
 verify.verifyClass(interfaces.Renderable, Turret)
 
+
+@implementer(interfaces.Steerable)
 class Shot(object):
-    
-    implements(interfaces.Steerable)
-    
     def __init__(self,
                  fromTurret,
                  velocity,
@@ -773,10 +769,9 @@ class Shot(object):
     
 verify.verifyClass(interfaces.Moveable, Shot)
 
+
+@implementer(interfaces.Renderable)
 class Stationary(object):
-    
-    implements(interfaces.Renderable)
-    
     def __init__(self,
                  position,
                  length,
